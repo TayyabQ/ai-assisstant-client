@@ -39,8 +39,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-bg-1: #F8F8F8;
-  --color-bg-2: #F3F3F3;
+  --color-gray-background: #F3F3F3;
+  --color-header-purple: #7B68EE;
 }
 
 :root {
