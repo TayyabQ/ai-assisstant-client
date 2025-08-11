@@ -1,6 +1,6 @@
 import Dashboard from "./dashboard/page";
-import Login from "./login/page";
-import Signup from "./signup/page";
+// import Login from "./login/page";
+// import Signup from "./signup/page";
 
 export default function Home() {
   return (

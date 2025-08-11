@@ -112,6 +112,11 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Any change that want in our whole app will be done from here, using global css */
+p {
+    font-family: Arial, sans-serif;
+  }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
