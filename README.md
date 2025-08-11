@@ -1,5 +1,7 @@
 To run AI Chatbot:
 
-'npm run dev'
+Clone github repo: https://github.com/TayyabQ/ai-assisstant-client
+Install dependencies: 'npm install'
+Run the project: 'npm run dev'
 
 This is a next js + tailwind project.
