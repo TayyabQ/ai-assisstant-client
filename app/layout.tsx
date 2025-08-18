@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionWrapper from "./SessionWrapper/page";
+import { ChatProvider } from "@/components/context_apis/chat_Context";
 
 export const metadata: Metadata = {
   title: "AI Assisstant",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <SessionWrapper>
-      <body>
-        {children}
-      </body>
+          <body>
+            <ChatProvider>
+              {children}
+            </ChatProvider>
+          </body>
       </SessionWrapper>
     </html>
   );

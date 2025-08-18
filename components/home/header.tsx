@@ -1,4 +1,3 @@
-import React from 'react'
 import SidebarToggle from './sidebar/sidebar_Toggle'
 
 const Header = () => {
