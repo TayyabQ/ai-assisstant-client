@@ -46,7 +46,7 @@ const Chat = () => {
     <div className='min-h-screen flex flex-col items-center justify-center px-10 md:px-20 lg:px-40'>
       <p className='text-[24px] md:text-[28px] lg:text-[40px] xl:text-[48px] 2xl:text-[72px] text-header-purple font-bold my-2'>Welcome to AI Assisstant</p>
       <p className='text-[11px] md:text-[18px] 2xl:text-[28px]'>I am your assisstant. You can ask me anything you want to ask!</p>
-    
+
       <div className="text-[14px] md:text-[24px] xl:text-[28px] 2xl:text-[36px] text-header-purple font-bold mt-8">
         {currentChat.chatTitle}
       </div>
