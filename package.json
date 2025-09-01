@@ -10,6 +10,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@getopenpay/openpay-js-react": "^0.5.17",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
@@ -19,9 +20,11 @@
     "lucide-react": "^0.537.0",
     "next": "15.4.5",
     "next-auth": "^4.24.11",
+    "openpay": "^1.0.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
