@@ -1,6 +1,12 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 export type Chat = {
   chatId: number;
@@ -34,7 +40,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       if (now - timestamp < 24 * 60 * 60 * 1000) {
         setChats(data);
       } else {
-        localStorage.removeItem('chats');
+        localStorage.removeItem("chats");
       }
     }
   }, []);
@@ -43,7 +49,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     if (chats.length > 0) {
       localStorage.setItem(
         "chats",
-        JSON.stringify({ data: chats, timestamp: Date.now() })
+        JSON.stringify({ data: chats, timestamp: Date.now() }),
       );
     }
   }, [chats]);
@@ -53,33 +59,39 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     setCurrentChatId(chatId);
   };
 
-  const setCurrentChat = (chatId: number, messages: string[], title: string) => {
-  setChats((prev) => {
-    const exists = prev.some((chat) => chat.chatId === chatId);
+  const setCurrentChat = (
+    chatId: number,
+    messages: string[],
+    title: string,
+  ) => {
+    setChats((prev) => {
+      const exists = prev.some((chat) => chat.chatId === chatId);
 
-    if (exists) {
-      return prev;
-    } else {
-      return [...prev, { chatId, messages, chatTitle: title }];
-    }
-  });
+      if (exists) {
+        return prev;
+      } else {
+        return [...prev, { chatId, messages, chatTitle: title }];
+      }
+    });
 
-  setCurrentChatId(chatId);
-};
+    setCurrentChatId(chatId);
+  };
 
   const updateName = (chatId: number, title: string) => {
     setChats((prev) =>
       prev.map((chat) =>
-        chat.chatId === currentChatId ? { ...chat, chatTitle: title } : chat
-      )
+        chat.chatId === chatId ? { ...chat, chatTitle: title } : chat,
+      ),
     );
   };
 
   const addMessage = (chatId: number, message: string) => {
     setChats((prev) =>
       prev.map((chat) =>
-        chat.chatId === chatId ? { ...chat, messages: [...chat.messages, message] } : chat
-      )
+        chat.chatId === chatId
+          ? { ...chat, messages: [...chat.messages, message] }
+          : chat,
+      ),
     );
   };
 
@@ -88,7 +100,17 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ChatContext.Provider value={{ chats, currentChatId, addChat, setCurrentChat, updateName, addMessage, openChat }}>
+    <ChatContext.Provider
+      value={{
+        chats,
+        currentChatId,
+        addChat,
+        setCurrentChat,
+        updateName,
+        addMessage,
+        openChat,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );
@@ -96,9 +118,8 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
 export const useChatContext = () => {
   const ctx = useContext(ChatContext);
-  if (!ctx) 
-  {
-    throw new Error('useChatContext is not being be used inside ChatProvider');
+  if (!ctx) {
+    throw new Error("useChatContext must be used inside ChatProvider");
   }
   return ctx;
 };
