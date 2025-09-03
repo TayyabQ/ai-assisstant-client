@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import useFetch from "../../components/hooks/useFetch";
 import { useToast } from "../../components/hooks/useToast";
 import { ToastContainer } from "../../components/ui/toast";
@@ -43,9 +45,22 @@ export default function CheckoutForm() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [amount, setAmount] = useState<string | undefined>(undefined);
   const [secureToken, setSecureToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
   const { fetchdata } = useFetch();
   const { toasts, showToast, removeToast } = useToast();
+
+  const errorMessages: Record<string, string> = {
+    cardExpiry: "Your card has expired. Please use a valid card.",
+    cardNumber: "The card number you entered is invalid.",
+    cvv: "The security code (CVV) is incorrect.",
+    email: "Please enter a valid email address.",
+    firstName: "First name is required.",
+    lastName: "Last name is required.",
+    zipCode: "Please enter a valid ZIP code.",
+    country: "Please select your country.",
+  };
 
   const onLoad = (totalAmountAtoms?: number) => {
     if (totalAmountAtoms) {
@@ -54,6 +69,7 @@ export default function CheckoutForm() {
   };
 
   const onCheckoutError = (message: string) => {
+    setLoading(false);
     setError(message);
     showToast("Payment failed. Please try again.", "error");
   };
@@ -77,8 +93,10 @@ export default function CheckoutForm() {
       console.log("👤 Customer ID:", safeCustomerId);
 
       // Show success toast
+      setLoading(false);
       showToast("Payment successful! Thank you for your purchase.", "success");
       setError(undefined);
+      router.push("/dashboard");
     } catch (error) {
       console.log(
         "✅ Checkout successful, but could not log details due to circular references",
@@ -120,7 +138,11 @@ export default function CheckoutForm() {
         checkoutSecureToken={secureToken} // only pass real token
         onChange={() => setError(undefined)}
         onLoad={onLoad}
-        onValidationError={setError}
+        onValidationError={(errKey: string) => {
+          const message =
+            errorMessages[errKey] || "Invalid input. Please check again.";
+          setError(message);
+        }}
         onCheckoutSuccess={onCheckoutSuccess}
         onCheckoutError={onCheckoutError}
       >
@@ -162,10 +184,27 @@ export default function CheckoutForm() {
 
             <button
               type="button"
-              onClick={() => submit()}
+              disabled={loading}
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => submit(), 2000);
+              }}
               className="px-4 py-2 mt-2 w-full font-bold rounded-lg bg-emerald-500 text-white hover:bg-emerald-400 active:bg-emerald-600"
             >
-              Pay {amount ?? ""}
+              {loading ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent bg-opacity-50">
+                  <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
+                    <img
+                      src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnY3NmZtM2xlem5oN29tNGV1Nmt6dHpraHN3aTE4bzM0Nmo5dHFicyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/17mNCcKU1mJlrbXodo/giphy.gif"
+                      alt="Loading"
+                      className="w-16 h-16 mb-4"
+                    />
+                    {/* <p className="font-semibold text-emerald-600">Processing Payment…</p> */}
+                  </div>
+                </div>
+              ) : (
+                <>Pay {amount ?? ""}</>
+              )}
             </button>
           </>
         )}
