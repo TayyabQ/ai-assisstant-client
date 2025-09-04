@@ -26,8 +26,12 @@ export default function Card({
   const [loading, setLoading] = useState(false);
 
   const handleSubscribe = () => {
-    setLoading(true);
-    router.push("/checkout");
+    if (price > "$0.00") {
+      setLoading(true);
+      router.push("/checkout");
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
