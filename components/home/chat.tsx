@@ -13,6 +13,7 @@ const Chat = () => {
     currentChatId,
     updateName,
     addMessage,
+    isLoading,
   } = useChatContext();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -21,7 +22,6 @@ const Chat = () => {
   const handleSend = () => {
     if (inputRef.current?.value && currentChat) {
       addMessage(currentChat.chatId, inputRef.current.value);
-      updateName(currentChat.chatId, inputRef.current.value);
       inputRef.current.value = "";
     }
   };
@@ -78,25 +78,43 @@ const Chat = () => {
       </div>
 
       <div className="w-full overflow-y-auto p-4">
-        {currentChat.messages.map((msg, idx) => (
-          <div key={idx} className="p-2 mb-2 bg-white rounded shadow-sm">
-            {msg}
+        {currentChat.messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`p-2 mb-2 rounded shadow-sm ${
+              msg.isUser ? "bg-blue-100 ml-8" : "bg-gray-100 mr-8"
+            }`}
+          >
+            <div className="text-xs text-gray-500 mb-1">
+              {msg.isUser ? "You" : "AI Assistant"}
+            </div>
+            <div>{msg.content}</div>
           </div>
         ))}
+        {isLoading && (
+          <div className="p-2 mb-2 bg-gray-100 mr-8 rounded shadow-sm">
+            <div className="text-xs text-gray-500 mb-1">AI Assistant</div>
+            <div className="flex items-center">
+              <div className="animate-pulse">Thinking...</div>
+            </div>
+          </div>
+        )}
       </div>
 
       <Textarea
         ref={inputRef}
         className="min-h-28 2xl:min-h-40 mt-8 border-header-purple shadow-sm"
         placeholder="Enter prompt ..."
+        disabled={isLoading}
       />
       <Button
         onClick={handleSend}
         className="w-50 mt-2 2xl:text-[24px] bg-header-purple text-white"
         variant="default"
         size="default"
+        disabled={isLoading}
       >
-        Go
+        {isLoading ? "Sending..." : "Go"}
       </Button>
     </div>
   );

@@ -7,21 +7,30 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import useFetch from "@/components/hooks/useFetch";
+
+export type Message = {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: number;
+};
 
 export type Chat = {
   chatId: number;
   chatTitle: string;
-  messages: string[];
+  messages: Message[];
 };
 
 type ChatContextType = {
   chats: Chat[];
   currentChatId: number | null;
-  addChat: (chatId: number, messages: string[], title: string) => void;
-  setCurrentChat: (chatId: number, messages: string[], title: string) => void;
+  addChat: (chatId: number, messages: Message[], title: string) => void;
+  setCurrentChat: (chatId: number, messages: Message[], title: string) => void;
   updateName: (chatId: number, title: string) => void;
   addMessage: (chatId: number, message: string) => void;
   openChat: (chatId: number) => void;
+  isLoading: boolean;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -29,6 +38,8 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { fetchdata } = useFetch();
 
   useEffect(() => {
     const stored = localStorage.getItem("chats");
@@ -54,14 +65,14 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [chats]);
 
-  const addChat = (chatId: number, messages: string[], title: string) => {
+  const addChat = (chatId: number, messages: Message[], title: string) => {
     setChats((prev) => [...prev, { chatId, messages, chatTitle: title }]);
     setCurrentChatId(chatId);
   };
 
   const setCurrentChat = (
     chatId: number,
-    messages: string[],
+    messages: Message[],
     title: string,
   ) => {
     setChats((prev) => {
@@ -86,13 +97,95 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addMessage = (chatId: number, message: string) => {
+    // Create user message
+    const userMessage: Message = {
+      id: `user_${Date.now()}`,
+      content: message,
+      isUser: true,
+      timestamp: Date.now(),
+    };
+
+    // Add user message to chat immediately
     setChats((prev) =>
       prev.map((chat) =>
         chat.chatId === chatId
-          ? { ...chat, messages: [...chat.messages, message] }
+          ? { ...chat, messages: [...chat.messages, userMessage] }
           : chat,
       ),
     );
+
+    // Set loading state
+    setIsLoading(true);
+
+    // Send message to API
+    fetchdata({
+      url: "http://localhost:3001/chat",
+      method: "POST",
+      body: { message: message },
+      onSuccess: async (response) => {
+        try {
+          const data = await response.json();
+          console.log(data);
+
+          // Create AI response message
+          const aiMessage: Message = {
+            id: `ai_${Date.now()}`,
+            content: data.reply || "No response received",
+            isUser: false,
+            timestamp: Date.now(),
+          };
+
+          // Add AI response to chat
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.chatId === chatId
+                ? { ...chat, messages: [...chat.messages, aiMessage] }
+                : chat,
+            ),
+          );
+        } catch (error) {
+          console.error("Error parsing API response:", error);
+
+          // Add error message
+          const errorMessage: Message = {
+            id: `error_${Date.now()}`,
+            content:
+              "Sorry, I couldn't process your request. Please try again.",
+            isUser: false,
+            timestamp: Date.now(),
+          };
+
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.chatId === chatId
+                ? { ...chat, messages: [...chat.messages, errorMessage] }
+                : chat,
+            ),
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      },
+      onFailure: () => {
+        // Add error message on API failure
+        const errorMessage: Message = {
+          id: `error_${Date.now()}`,
+          content:
+            "Sorry, I couldn't connect to the server. Please try again later.",
+          isUser: false,
+          timestamp: Date.now(),
+        };
+
+        setChats((prev) =>
+          prev.map((chat) =>
+            chat.chatId === chatId
+              ? { ...chat, messages: [...chat.messages, errorMessage] }
+              : chat,
+          ),
+        );
+        setIsLoading(false);
+      },
+    });
   };
 
   const openChat = (chatId: number) => {
@@ -109,6 +202,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         updateName,
         addMessage,
         openChat,
+        isLoading,
       }}
     >
       {children}
