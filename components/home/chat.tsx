@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import { useChatContext } from "@/components/context_apis/chat_Context";
 import { Button } from "@/components/ui/button";

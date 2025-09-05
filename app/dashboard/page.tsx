@@ -1,5 +1,3 @@
-"use client";
-
 import Chat from "@/components/home/chat";
 import Header from "@/components/home/header";
 import Sidebar from "@/components/home/sidebar/sidebar";
