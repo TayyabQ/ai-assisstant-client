@@ -26,8 +26,6 @@ type ChatContextType = {
   chats: Chat[];
   currentChatId: number | null;
   addChat: (chatId: number, messages: Message[], title: string) => void;
-  setCurrentChat: (chatId: number, messages: Message[], title: string) => void;
-  updateName: (chatId: number, title: string) => void;
   addMessage: (chatId: number, message: string) => void;
   openChat: (chatId: number) => void;
   isLoading: boolean;
@@ -58,42 +56,29 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (chats.length > 0) {
-      localStorage.setItem(
-        "chats",
-        JSON.stringify({ data: chats, timestamp: Date.now() }),
+      // Filter out empty chats - only save chats that have at least one message
+      const chatsWithMessages = chats.filter(
+        (chat) => chat.messages && chat.messages.length > 0,
       );
+
+      if (chatsWithMessages.length > 0) {
+        // Renumber chat IDs to remove gaps (start from 1)
+        const renumberedChats = chatsWithMessages.map((chat, index) => ({
+          ...chat,
+          chatId: index + 1,
+        }));
+
+        localStorage.setItem(
+          "chats",
+          JSON.stringify({ data: renumberedChats, timestamp: Date.now() }),
+        );
+      }
     }
   }, [chats]);
 
   const addChat = (chatId: number, messages: Message[], title: string) => {
     setChats((prev) => [...prev, { chatId, messages, chatTitle: title }]);
     setCurrentChatId(chatId);
-  };
-
-  const setCurrentChat = (
-    chatId: number,
-    messages: Message[],
-    title: string,
-  ) => {
-    setChats((prev) => {
-      const exists = prev.some((chat) => chat.chatId === chatId);
-
-      if (exists) {
-        return prev;
-      } else {
-        return [...prev, { chatId, messages, chatTitle: title }];
-      }
-    });
-
-    setCurrentChatId(chatId);
-  };
-
-  const updateName = (chatId: number, title: string) => {
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.chatId === chatId ? { ...chat, chatTitle: title } : chat,
-      ),
-    );
   };
 
   const addMessage = (chatId: number, message: string) => {
@@ -113,6 +98,13 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
           : chat,
       ),
     );
+
+    // Set chat title
+    for (let i = 0; i < chats.length; i++) {
+      if (chats[i].chatId === chatId) {
+        chats[i].chatTitle = message;
+      }
+    }
 
     // Set loading state
     setIsLoading(true);
@@ -198,8 +190,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         chats,
         currentChatId,
         addChat,
-        setCurrentChat,
-        updateName,
         addMessage,
         openChat,
         isLoading,

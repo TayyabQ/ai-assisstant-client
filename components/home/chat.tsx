@@ -6,15 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "../ui/textarea";
 
 const Chat = () => {
-  const {
-    chats,
-    addChat,
-    setCurrentChat,
-    currentChatId,
-    updateName,
-    addMessage,
-    isLoading,
-  } = useChatContext();
+  const { chats, addChat, currentChatId, addMessage, isLoading } =
+    useChatContext();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const currentChat = chats.find((c) => c.chatId === currentChatId);
@@ -29,10 +22,7 @@ const Chat = () => {
   const handleNewDefaultChat = () => {
     if (inputRef.current?.value) {
       const newId = chats.length + 1;
-      // Create a new chat
       addChat(newId, [], inputRef.current.value);
-      // Set it as current chat
-      setCurrentChat(newId, [], inputRef.current.value);
       addMessage(newId, inputRef.current.value);
       inputRef.current.value = "";
     }
