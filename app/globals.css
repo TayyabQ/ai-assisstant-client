@@ -40,6 +40,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-gray-background: #F3F3F3;
+  --color-gray-subheading: oklch(55.1% 0.027 264.364);
   --color-header-purple: #7B68EE;
 }
 

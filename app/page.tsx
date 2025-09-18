@@ -1,11 +1,13 @@
-import Dashboard from "./dashboard/page";
-// import Login from "./login/page";
-// import Signup from "./signup/page";
+import Subscriptions from "./subscriptions/page";
+import Logout from "./logout/page";
 
-export default function Home() {
+export default function Component() {
   return (
-    <Dashboard/>
-    // <Login/>
-    // <Signup/>
+    <>
+      <div className="flex justify-end p-2">
+        <Logout />
+      </div>
+      <Subscriptions />
+    </>
   );
 }
