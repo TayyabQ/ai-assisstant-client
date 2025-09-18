@@ -1,6 +1,8 @@
 interface FetchProps {
   url: string;
   method: string;
+  token?: string;
+  headers?: object;
   body?: object;
   onFailure: () => void;
   onSuccess: (response: Response) => void;
@@ -10,6 +12,7 @@ export default function useFetch() {
   const fetchdata = async ({
     url,
     method,
+    token,
     body,
     onSuccess,
     onFailure,
@@ -19,6 +22,7 @@ export default function useFetch() {
         method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       });

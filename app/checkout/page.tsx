@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import useFetch from "../../components/hooks/useFetch";
 import { useToast } from "../../components/hooks/useToast";
@@ -51,6 +52,11 @@ export default function CheckoutForm() {
   const router = useRouter();
   const { fetchdata } = useFetch();
   const { toasts, showToast, removeToast } = useToast();
+
+  const { data } = useSession();
+  console.log(data);
+  const accessToken = data?.accessToken;
+  console.log(accessToken);
 
   const errorMessages: Record<string, string> = {
     cardExpiry: "Your card has expired. Please use a valid card.",
@@ -111,6 +117,7 @@ export default function CheckoutForm() {
     fetchdata({
       url: "http://localhost:3001/checkout/session",
       method: "POST",
+      token: accessToken,
       onSuccess: async (response: Response) => {
         const { secure_token } = await response.json();
         setSecureToken(secure_token);
